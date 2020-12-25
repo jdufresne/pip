@@ -2,9 +2,6 @@
 A module that implements tooling to enable easy warnings about deprecations.
 """
 
-# The following comment should be removed at some point in the future.
-# mypy: disallow-untyped-defs=False
-
 import logging
 import warnings
 
@@ -14,7 +11,7 @@ from pip import __version__ as current_version
 from pip._internal.utils.typing import MYPY_CHECK_RUNNING
 
 if MYPY_CHECK_RUNNING:
-    from typing import Any, Optional
+    from typing import Any, Optional, TextIO, Type, Union
 
 
 DEPRECATION_MSG_PREFIX = "DEPRECATION: "
@@ -28,7 +25,15 @@ _original_showwarning = None  # type: Any
 
 
 # Warnings <-> Logging Integration
-def _showwarning(message, category, filename, lineno, file=None, line=None):
+def _showwarning(
+    message,  # type: Union[Warning, str]
+    category,  # type: Type[Warning]
+    filename,  # type: str
+    lineno,  # type: int
+    file=None,  # type: Optional[TextIO]
+    line=None,  # type: Optional[str]
+):
+    # type: (...) -> None
     if file is not None:
         if _original_showwarning is not None:
             _original_showwarning(

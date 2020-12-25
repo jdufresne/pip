@@ -39,7 +39,10 @@ from pip._internal.utils.typing import MYPY_CHECK_RUNNING
 from pip._internal.utils.urls import url_to_path
 
 if MYPY_CHECK_RUNNING:
-    from typing import Iterator, List, Optional, Tuple, Union
+    from typing import Any, Iterator, List, Mapping, Optional, Tuple, Union
+
+    from pip._vendor.connectionpool import ConnectionPool
+    from pip._vendor.requests.models import PreparedRequest
 
     from pip._internal.models.link import Link
 
@@ -178,8 +181,16 @@ def user_agent():
 
 class LocalFSAdapter(BaseAdapter):
 
-    def send(self, request, stream=None, timeout=None, verify=None, cert=None,
-             proxies=None):
+    def send(
+        self,
+        request,  # type: PreparedRequest
+        stream=False,  # type: bool
+        timeout=None,  # type: Optional[Union[float, Tuple[float, float]]]
+        verify=True,  # type: Union[bool, str]
+        cert=None,  # type: Optional[Union[str, Tuple[str, str]]]
+        proxies=None,  # type:Optional[Mapping[str, str]]
+    ):
+        # type: (...) -> Response
         pathname = url_to_path(request.url)
 
         resp = Response()
@@ -206,18 +217,33 @@ class LocalFSAdapter(BaseAdapter):
         return resp
 
     def close(self):
+        # type: () -> None
         pass
 
 
 class InsecureHTTPAdapter(HTTPAdapter):
 
-    def cert_verify(self, conn, url, verify, cert):
+    def cert_verify(
+        self,
+        conn,  # type: ConnectionPool
+        url,  # type: str
+        verify,  # type: Union[bool, str]
+        cert,  # type: Optional[Union[str, Tuple[str, str]]]
+    ):
+        # type: (...) -> None
         super().cert_verify(conn=conn, url=url, verify=False, cert=cert)
 
 
 class InsecureCacheControlAdapter(CacheControlAdapter):
 
-    def cert_verify(self, conn, url, verify, cert):
+    def cert_verify(
+        self,
+        conn,  # type: ConnectionPool
+        url,  # type: str
+        verify,  # type: Union[bool, str]
+        cert,  # type: Optional[Union[str, Tuple[str, str]]]
+    ):
+        # type: (...) -> None
         super().cert_verify(conn=conn, url=url, verify=False, cert=cert)
 
 
@@ -226,6 +252,7 @@ class PipSession(requests.Session):
     timeout = None  # type: Optional[int]
 
     def __init__(self, *args, **kwargs):
+        # type: (*Any, **Any) -> None
         """
         :param trusted_hosts: Domains not to emit warnings for when not using
             HTTPS.
@@ -417,6 +444,7 @@ class PipSession(requests.Session):
         return False
 
     def request(self, method, url, *args, **kwargs):
+        # type: (str, str, *Any, **Any) -> Response
         # Allow setting a default timeout on a session
         kwargs.setdefault("timeout", self.timeout)
 

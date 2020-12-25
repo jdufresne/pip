@@ -14,6 +14,10 @@ from pip._vendor.contextlib2 import suppress
 from pip._internal.cli.status_codes import UNKNOWN_ERROR
 from pip._internal.configuration import Configuration, ConfigurationError
 from pip._internal.utils.misc import redact_auth_from_url, strtobool
+from pip._internal.utils.typing import MYPY_CHECK_RUNNING
+
+if MYPY_CHECK_RUNNING:
+    from typing import Any, Dict, Iterator, List, Tuple
 
 logger = logging.getLogger(__name__)
 
@@ -22,6 +26,7 @@ class PrettyHelpFormatter(optparse.IndentedHelpFormatter):
     """A prettier/less verbose help formatter for optparse."""
 
     def __init__(self, *args, **kwargs):
+        # type: (*Any, **Any) -> None
         # help position must be aligned with __init__.parseopts.description
         kwargs['max_help_position'] = 30
         kwargs['indent_increment'] = 1
@@ -55,11 +60,13 @@ class PrettyHelpFormatter(optparse.IndentedHelpFormatter):
         return ''.join(opts)
 
     def format_heading(self, heading):
+        # type: (str) -> str
         if heading == 'Options':
             return ''
         return heading + ':\n'
 
     def format_usage(self, usage):
+        # type: (str) -> str
         """
         Ensure there is only one newline between usage and the first heading
         if there is no description.
@@ -69,6 +76,7 @@ class PrettyHelpFormatter(optparse.IndentedHelpFormatter):
         return msg
 
     def format_description(self, description):
+        # type: (str) -> str
         # leave full control over description to us
         if description:
             if hasattr(self.parser, 'main'):
@@ -87,6 +95,7 @@ class PrettyHelpFormatter(optparse.IndentedHelpFormatter):
             return ''
 
     def format_epilog(self, epilog):
+        # type: (str) -> str
         # leave full control over epilog to us
         if epilog:
             return epilog
@@ -94,6 +103,7 @@ class PrettyHelpFormatter(optparse.IndentedHelpFormatter):
             return ''
 
     def indent_lines(self, text, indent):
+        # type: (str, str) -> str
         new_lines = [indent + line for line in text.split('\n')]
         return "\n".join(new_lines)
 
@@ -155,6 +165,7 @@ class ConfigOptionParser(CustomOptionParser):
     configuration files and environmental variables"""
 
     def __init__(self, *args, **kwargs):
+        # type: (*Any, **Any) -> None
         self.name = kwargs.pop('name')
 
         isolated = kwargs.pop("isolated", False)
@@ -164,6 +175,7 @@ class ConfigOptionParser(CustomOptionParser):
         super().__init__(*args, **kwargs)
 
     def check_default(self, option, key, val):
+        # type: (optparse.Option, str, Any) -> Any
         try:
             return option.check_value(key, val)
         except optparse.OptionValueError as exc:
@@ -171,11 +183,14 @@ class ConfigOptionParser(CustomOptionParser):
             sys.exit(3)
 
     def _get_ordered_configuration_items(self):
+        # type: () -> Iterator[Tuple[str, Any]]
         # Configuration gives keys in an unordered manner. Order them.
         override_order = ["global", self.name, ":env:"]
 
         # Pool the options into different groups
-        section_items = {name: [] for name in override_order}
+        section_items = {
+            name: [] for name in override_order
+        }  # type: Dict[str, List[Tuple[str, Any]]]
         for section_key, val in self.config.items():
             # ignore empty values
             if not val:
@@ -256,6 +271,7 @@ class ConfigOptionParser(CustomOptionParser):
         return defaults
 
     def get_default_values(self):
+        # type: () -> optparse.Values
         """Overriding to make updating the defaults after instantiation of
         the option parser possible, _update_defaults() does the dirty work."""
         if not self.process_default_values:
@@ -277,5 +293,6 @@ class ConfigOptionParser(CustomOptionParser):
         return optparse.Values(defaults)
 
     def error(self, msg):
+        # type: (str) -> None
         self.print_usage(sys.stderr)
         self.exit(UNKNOWN_ERROR, f"{msg}\n")

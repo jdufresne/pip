@@ -1,6 +1,3 @@
-# The following comment should be removed at some point in the future.
-# mypy: disallow-untyped-defs=False
-
 import contextlib
 import errno
 import logging
@@ -12,6 +9,10 @@ from logging import Filter, getLogger
 from pip._internal.utils.compat import WINDOWS
 from pip._internal.utils.deprecation import DEPRECATION_MSG_PREFIX
 from pip._internal.utils.misc import ensure_dir
+from pip._internal.utils.typing import MYPY_CHECK_RUNNING, cast
+
+if MYPY_CHECK_RUNNING:
+    from typing import IO, Any, Callable, Iterator, Optional, TextIO, Type
 
 try:
     import threading
@@ -44,13 +45,15 @@ if WINDOWS:
     # https://bugs.python.org/issue19612
     # https://bugs.python.org/issue30418
     def _is_broken_pipe_error(exc_class, exc):
+        # type: (Type[BaseException], BaseException) -> bool
         """See the docstring for non-Windows below."""
         return ((exc_class is BrokenPipeError) or
-                (exc_class is OSError and
+                (isinstance(exc, OSError) and
                  exc.errno in (errno.EINVAL, errno.EPIPE)))
 else:
     # Then we are in the non-Windows case.
     def _is_broken_pipe_error(exc_class, exc):
+        # type: (Type[BaseException], BaseException) -> bool
         """
         Return whether an exception is a broken pipe error.
 
@@ -63,6 +66,7 @@ else:
 
 @contextlib.contextmanager
 def indent_log(num=2):
+    # type: (int) -> Iterator[None]
     """
     A context manager which will cause the log output to be indented for any
     log messages emitted inside it.
@@ -77,6 +81,7 @@ def indent_log(num=2):
 
 
 def get_indentation():
+    # type: () -> int
     return getattr(_log_state, 'indentation', 0)
 
 
@@ -84,6 +89,7 @@ class IndentingFormatter(logging.Formatter):
     default_time_format = "%Y-%m-%dT%H:%M:%S"
 
     def __init__(self, *args, **kwargs):
+        # type: (*Any, **Any) -> None
         """
         A logging.Formatter that obeys the indent_log() context manager.
 
@@ -94,6 +100,7 @@ class IndentingFormatter(logging.Formatter):
         super().__init__(*args, **kwargs)
 
     def get_message_start(self, formatted, levelno):
+        # type: (str, int) -> str
         """
         Return the start of the formatted log message (not counting the
         prefix to add to each line).
@@ -110,6 +117,7 @@ class IndentingFormatter(logging.Formatter):
         return 'ERROR: '
 
     def format(self, record):
+        # type: (logging.LogRecord) -> str
         """
         Calls the standard formatter, but will indent all of the log message
         lines by our current indentation level.
@@ -130,7 +138,9 @@ class IndentingFormatter(logging.Formatter):
 
 
 def _color_wrap(*colors):
+    # type: (*str) -> Callable[[str], str]
     def wrapped(inp):
+        # type: (str) -> str
         return "".join(list(colors) + [inp, colorama.Style.RESET_ALL])
     return wrapped
 
@@ -147,7 +157,8 @@ class ColorizedStreamHandler(logging.StreamHandler):
     else:
         COLORS = []
 
-    def __init__(self, stream=None, no_color=None):
+    def __init__(self, stream=None, no_color=False):
+        # type: (Optional[TextIO], bool) -> None
         super().__init__(stream)
         self._no_color = no_color
 
@@ -155,16 +166,19 @@ class ColorizedStreamHandler(logging.StreamHandler):
             self.stream = colorama.AnsiToWin32(self.stream)
 
     def _using_stdout(self):
+        # type: () -> bool
         """
         Return whether the handler is using sys.stdout.
         """
         if WINDOWS and colorama:
             # Then self.stream is an AnsiToWin32 object.
-            return self.stream.wrapped is sys.stdout
+            stream = cast(colorama.AnsiToWin32, self.stream)
+            return stream.wrapped is sys.stdout
 
         return self.stream is sys.stdout
 
     def should_color(self):
+        # type: () -> bool
         # Don't colorize things if we do not have colorama or if told not to
         if not colorama or self._no_color:
             return False
@@ -186,6 +200,7 @@ class ColorizedStreamHandler(logging.StreamHandler):
         return False
 
     def format(self, record):
+        # type: (logging.LogRecord) -> str
         msg = logging.StreamHandler.format(self, record)
 
         if self.should_color():
@@ -198,21 +213,23 @@ class ColorizedStreamHandler(logging.StreamHandler):
 
     # The logging module says handleError() can be customized.
     def handleError(self, record):
+        # type: (logging.LogRecord) -> None
         exc_class, exc = sys.exc_info()[:2]
         # If a broken pipe occurred while calling write() or flush() on the
         # stdout stream in logging's Handler.emit(), then raise our special
         # exception so we can handle it in main() instead of logging the
         # broken pipe error and continuing.
-        if (exc_class and self._using_stdout() and
+        if (exc_class and exc and self._using_stdout() and
                 _is_broken_pipe_error(exc_class, exc)):
             raise BrokenStdoutLoggingError()
 
-        return super().handleError(record)
+        super().handleError(record)
 
 
 class BetterRotatingFileHandler(logging.handlers.RotatingFileHandler):
 
     def _open(self):
+        # type: () -> IO[Any]
         ensure_dir(os.path.dirname(self.baseFilename))
         return logging.handlers.RotatingFileHandler._open(self)
 
@@ -220,9 +237,11 @@ class BetterRotatingFileHandler(logging.handlers.RotatingFileHandler):
 class MaxLevelFilter(Filter):
 
     def __init__(self, level):
+        # type: (int) -> None
         self.level = level
 
     def filter(self, record):
+        # type: (logging.LogRecord) -> bool
         return record.levelno < self.level
 
 
@@ -233,12 +252,14 @@ class ExcludeLoggerFilter(Filter):
     """
 
     def filter(self, record):
+        # type: (logging.LogRecord) -> bool
         # The base Filter class allows only records from a logger (or its
         # children).
         return not super().filter(record)
 
 
 def setup_logging(verbosity, no_color, user_log_file):
+    # type: (int, bool, Optional[str]) -> int
     """Configures and sets up all of the logging
 
     Returns the requested logging level, as its integer value.
