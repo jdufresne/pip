@@ -1,8 +1,7 @@
+import collections.abc
 import functools
 import itertools
 import operator
-
-from pip._vendor.six.moves import collections_abc  # type: ignore
 
 from pip._internal.utils.typing import MYPY_CHECK_RUNNING
 
@@ -46,7 +45,7 @@ def _insert_installed(installed, others):
     return iter(candidates)
 
 
-class FoundCandidates(collections_abc.Sequence):
+class FoundCandidates(collections.abc.Sequence):
     """A lazy sequence to provide candidates to the resolver.
 
     The intended usage is to return this from `find_matches()` so the resolver

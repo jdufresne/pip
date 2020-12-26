@@ -2,26 +2,26 @@
 """
 
 import logging
+import xmlrpc.client
 from urllib import parse as urllib_parse
-
-# NOTE: XMLRPC Client is not annotated in typeshed as on 2017-07-17, which is
-#       why we ignore the type on this import
-from pip._vendor.six.moves import xmlrpc_client  # type: ignore
 
 from pip._internal.exceptions import NetworkConnectionError
 from pip._internal.network.utils import raise_for_status
 from pip._internal.utils.typing import MYPY_CHECK_RUNNING
 
 if MYPY_CHECK_RUNNING:
-    from typing import Dict
+    from datetime import datetime
+    from typing import Dict, Tuple, Union
 
     from pip._internal.network.session import PipSession
+
+    _Marshallable = Union[None, bool, int, float, str, bytes, tuple, list, dict, datetime, DateTime, Binary]
 
 
 logger = logging.getLogger(__name__)
 
 
-class PipXmlrpcTransport(xmlrpc_client.Transport):
+class PipXmlrpcTransport(xmlrpc.client.Transport):
     """Provide a `xmlrpclib.Transport` implementation via a `PipSession`
     object.
     """
@@ -33,8 +33,14 @@ class PipXmlrpcTransport(xmlrpc_client.Transport):
         self._scheme = index_parts.scheme
         self._session = session
 
-    def request(self, host, handler, request_body, verbose=False):
-        # type: (str, str, Dict[str, str], bool) -> None
+    def request(
+        self,
+        host,  # type: Union[Tuple[str, Dict[str, str]], str]
+        handler,  # type: str
+        request_body,  # type: bytes
+        verbose=False,  # type: bool
+    ):
+        # type: (...) -> Tuple[Union[None, bool, int, float, str, bytes, Tuple[Any, ...], List[Any], Dict[Any, Any], datetime, DateTime, Binary], ...]
         parts = (self._scheme, host, handler, None, None, None)
         url = urllib_parse.urlunparse(parts)
         try:
