@@ -72,7 +72,7 @@ repos:
   rev: v0.790
   hooks:
   - id: mypy
-    exclude: docs|tests
+    exclude: ^(docs|tests/(data|functional|unit|yaml))
     args: ["--pretty"]
 
 - repo: https://github.com/pre-commit/pygrep-hooks

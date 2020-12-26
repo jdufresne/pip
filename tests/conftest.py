@@ -24,10 +24,11 @@ from tests.lib.server import make_mock_server, server_running
 from tests.lib.venv import VirtualEnvironment
 
 if MYPY_CHECK_RUNNING:
-    from typing import Dict, Iterable
+    from typing import Iterable, List
+
+    from _typeshed.wsgi import WSGIApplication
 
     from tests.lib.server import MockServer as _MockServer
-    from tests.lib.server import Responder
 
 
 def pytest_addoption(parser):
@@ -522,7 +523,7 @@ class MockServer:
         return self._server.host
 
     def set_responses(self, responses):
-        # type: (Iterable[Responder]) -> None
+        # type: (Iterable[WSGIApplication]) -> None
         assert not self._running, "responses cannot be set on running server"
         self._server.mock.side_effect = responses
 
@@ -546,7 +547,7 @@ class MockServer:
         self.context.close()
 
     def get_requests(self):
-        # type: () -> Dict[str, str]
+        # type: () -> List[str]
         """Get environ for each received request.
         """
         assert not self._running, "cannot get mock from running server"

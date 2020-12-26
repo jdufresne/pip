@@ -17,7 +17,7 @@ from tests.lib.wheel import (
 )
 
 if MYPY_CHECK_RUNNING:
-    from email import Message
+    from email.message import Message
 
 
 def test_message_from_dict_one_value():
