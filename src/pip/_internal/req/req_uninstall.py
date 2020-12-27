@@ -130,10 +130,10 @@ def compress_for_rename(paths):
     This set may include directories when the original sequence of paths
     included every file on disk.
     """
-    case_map = dict((os.path.normcase(p), p) for p in paths)
+    case_map = {os.path.normcase(p): p for p in paths}
     remaining = set(case_map)
-    unchecked = sorted(set(os.path.split(p)[0]
-                           for p in case_map.values()), key=len)
+    unchecked = sorted({os.path.split(p)[0]
+                           for p in case_map.values()}, key=len)
     wildcards = set()  # type: Set[str]
 
     def norm_join(*a):
@@ -545,7 +545,7 @@ class UninstallPathSet:
 
         elif develop_egg_link:
             # develop egg
-            with open(develop_egg_link, 'r') as fh:
+            with open(develop_egg_link) as fh:
                 link_pointer = os.path.normcase(fh.readline().strip())
             assert (link_pointer == dist.location), (
                 'Egg-link {} does not match installed location of {} '
