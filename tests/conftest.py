@@ -8,9 +8,9 @@ import subprocess
 import sys
 import time
 from contextlib import contextmanager
+from unittest.mock import patch
 
 import pytest
-from mock import patch
 from pip._vendor.contextlib2 import ExitStack, nullcontext
 from setuptools.wheel import Wheel
 
@@ -550,8 +550,10 @@ class MockServer:
         """Get environ for each received request.
         """
         assert not self._running, "cannot get mock from running server"
+        # TODO: Change call[-2][0] to call.args[0] after dropping Python 3.7
+        # support.
         return [
-            call.args[0] for call in self._server.mock.call_args_list
+            call[-2][0] for call in self._server.mock.call_args_list
         ]
 
 

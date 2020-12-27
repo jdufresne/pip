@@ -1850,7 +1850,9 @@ def test_install_sends_client_cert(install_args, script, cert_factory, data):
 
     assert server.mock.call_count == 2
     for call_args in server.mock.call_args_list:
-        environ, _ = call_args.args
+        # TODO: Change call_args[-2] to call_args.args after dropping Python 3.7
+        # support.
+        environ, _ = call_args[-2]
         assert "SSL_CLIENT_CERT" in environ
         assert environ["SSL_CLIENT_CERT"]
 
