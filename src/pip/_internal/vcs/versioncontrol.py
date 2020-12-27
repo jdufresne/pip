@@ -6,7 +6,18 @@ import shutil
 import subprocess
 import sys
 import urllib.parse
-from typing import TYPE_CHECKING
+from typing import (
+    Any,
+    Dict,
+    Iterable,
+    Iterator,
+    List,
+    Mapping,
+    Optional,
+    Tuple,
+    Type,
+    Union,
+)
 
 from pip._vendor import pkg_resources
 
@@ -14,6 +25,7 @@ from pip._internal.exceptions import BadCommand, InstallationError, SubProcessEr
 from pip._internal.utils.compat import console_to_str
 from pip._internal.utils.logging import subprocess_logger
 from pip._internal.utils.misc import (
+    HiddenText,
     ask_path_exists,
     backup_dir,
     display_path,
@@ -22,6 +34,7 @@ from pip._internal.utils.misc import (
     rmtree,
 )
 from pip._internal.utils.subprocess import (
+    CommandArgs,
     format_command_args,
     make_command,
     make_subprocess_output_error,
@@ -29,24 +42,7 @@ from pip._internal.utils.subprocess import (
 )
 from pip._internal.utils.urls import get_url_scheme
 
-if TYPE_CHECKING:
-    from typing import (
-        Any,
-        Dict,
-        Iterable,
-        Iterator,
-        List,
-        Mapping,
-        Optional,
-        Tuple,
-        Type,
-        Union,
-    )
-
-    from pip._internal.utils.misc import HiddenText
-    from pip._internal.utils.subprocess import CommandArgs
-
-    AuthInfo = Tuple[Optional[str], Optional[str]]
+AuthInfo = Tuple[Optional[str], Optional[str]]
 
 
 __all__ = ['vcs']

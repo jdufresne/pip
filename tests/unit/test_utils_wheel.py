@@ -1,7 +1,6 @@
 import os
 from email import message_from_string
 from io import BytesIO
-from typing import TYPE_CHECKING
 from zipfile import ZipFile
 
 import pytest
@@ -9,9 +8,7 @@ from pip._vendor.contextlib2 import ExitStack
 
 from pip._internal.exceptions import UnsupportedWheel
 from pip._internal.utils import wheel
-
-if TYPE_CHECKING:
-    from tests.lib.path import Path
+from tests.lib.path import Path
 
 
 @pytest.fixture

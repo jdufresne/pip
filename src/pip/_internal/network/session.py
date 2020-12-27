@@ -15,7 +15,7 @@ import platform
 import sys
 import urllib.parse
 import warnings
-from typing import TYPE_CHECKING
+from typing import Iterator, List, Optional, Tuple, Union
 
 from pip._vendor import requests, six, urllib3
 from pip._vendor.cachecontrol import CacheControlAdapter
@@ -25,6 +25,7 @@ from pip._vendor.requests.structures import CaseInsensitiveDict
 from pip._vendor.urllib3.exceptions import InsecureRequestWarning
 
 from pip import __version__
+from pip._internal.models.link import Link
 from pip._internal.network.auth import MultiDomainBasicAuth
 from pip._internal.network.cache import SafeFileCache
 
@@ -38,16 +39,9 @@ from pip._internal.utils.misc import (
 )
 from pip._internal.utils.urls import url_to_path
 
-if TYPE_CHECKING:
-    from typing import Iterator, List, Optional, Tuple, Union
-
-    from pip._internal.models.link import Link
-
-    SecureOrigin = Tuple[str, str, Optional[Union[int, str]]]
-
-
 logger = logging.getLogger(__name__)
 
+SecureOrigin = Tuple[str, str, Optional[Union[int, str]]]
 
 # Ignore warning raised when using --trusted-host.
 warnings.filterwarnings("ignore", category=InsecureRequestWarning)

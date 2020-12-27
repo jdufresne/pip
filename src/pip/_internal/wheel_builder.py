@@ -6,17 +6,19 @@ import os.path
 import re
 import shutil
 import zipfile
-from typing import TYPE_CHECKING
+from typing import Any, Callable, Iterable, List, Optional, Tuple
 
 from pip._vendor.packaging.utils import canonicalize_name, canonicalize_version
 from pip._vendor.packaging.version import InvalidVersion, Version
 from pip._vendor.pkg_resources import Distribution
 
+from pip._internal.cache import WheelCache
 from pip._internal.exceptions import InvalidWheelFilename, UnsupportedWheel
 from pip._internal.models.link import Link
 from pip._internal.models.wheel import Wheel
 from pip._internal.operations.build.wheel import build_wheel_pep517
 from pip._internal.operations.build.wheel_legacy import build_wheel_legacy
+from pip._internal.req.req_install import InstallRequirement
 from pip._internal.utils.logging import indent_log
 from pip._internal.utils.misc import ensure_dir, hash_file, is_wheel_installed
 from pip._internal.utils.setuptools_build import make_setuptools_clean_args
@@ -26,16 +28,10 @@ from pip._internal.utils.urls import path_to_url
 from pip._internal.utils.wheel import pkg_resources_distribution_for_wheel
 from pip._internal.vcs import vcs
 
-if TYPE_CHECKING:
-    from typing import Any, Callable, Iterable, List, Optional, Tuple
-
-    from pip._internal.cache import WheelCache
-    from pip._internal.req.req_install import InstallRequirement
-
-    BinaryAllowedPredicate = Callable[[InstallRequirement], bool]
-    BuildResult = Tuple[List[InstallRequirement], List[InstallRequirement]]
-
 logger = logging.getLogger(__name__)
+
+BinaryAllowedPredicate = Callable[[InstallRequirement], bool]
+BuildResult = Tuple[List[InstallRequirement], List[InstallRequirement]]
 
 _egg_info_re = re.compile(r'([a-z0-9_.]+)-([a-z0-9_.!+-]+)', re.IGNORECASE)
 

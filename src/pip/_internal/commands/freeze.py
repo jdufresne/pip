@@ -1,5 +1,6 @@
 import sys
-from typing import TYPE_CHECKING
+from optparse import Values
+from typing import List
 
 from pip._internal.cache import WheelCache
 from pip._internal.cli import cmdoptions
@@ -11,10 +12,6 @@ from pip._internal.utils.compat import stdlib_pkgs
 from pip._internal.utils.deprecation import deprecated
 
 DEV_PKGS = {'pip', 'setuptools', 'distribute', 'wheel'}
-
-if TYPE_CHECKING:
-    from optparse import Values
-    from typing import List
 
 
 class FreezeCommand(Command):

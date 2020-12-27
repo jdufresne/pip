@@ -16,10 +16,23 @@ import sys
 import urllib.parse
 from io import StringIO
 from itertools import filterfalse, tee, zip_longest
-from typing import TYPE_CHECKING, cast
+from typing import (
+    Any,
+    AnyStr,
+    Callable,
+    Container,
+    Iterable,
+    Iterator,
+    List,
+    Optional,
+    Tuple,
+    TypeVar,
+    cast,
+)
 
 from pip._vendor import pkg_resources
 from pip._vendor.packaging.utils import canonicalize_name
+from pip._vendor.pkg_resources import Distribution
 
 # NOTE: retrying is not annotated in typeshed as on 2017-07-17, which is
 #       why we ignore the type on this import.
@@ -34,26 +47,6 @@ from pip._internal.utils.virtualenv import (
     virtualenv_no_global,
 )
 
-if TYPE_CHECKING:
-    from typing import (
-        Any,
-        AnyStr,
-        Callable,
-        Container,
-        Iterable,
-        Iterator,
-        List,
-        Optional,
-        Tuple,
-        TypeVar,
-    )
-
-    from pip._vendor.pkg_resources import Distribution
-
-    VersionInfo = Tuple[int, int, int]
-    T = TypeVar("T")
-
-
 __all__ = ['rmtree', 'display_path', 'backup_dir',
            'ask', 'splitext',
            'format_size', 'is_installable_dir',
@@ -64,6 +57,9 @@ __all__ = ['rmtree', 'display_path', 'backup_dir',
 
 
 logger = logging.getLogger(__name__)
+
+VersionInfo = Tuple[int, int, int]
+T = TypeVar("T")
 
 
 def get_pip_version():

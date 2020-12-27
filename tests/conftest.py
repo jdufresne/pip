@@ -8,7 +8,7 @@ import subprocess
 import sys
 import time
 from contextlib import contextmanager
-from typing import TYPE_CHECKING
+from typing import Dict, Iterable
 
 import pytest
 from mock import patch
@@ -20,14 +20,9 @@ from pip._internal.utils.temp_dir import global_tempdir_manager
 from tests.lib import DATA_DIR, SRC_DIR, PipTestEnvironment, TestData
 from tests.lib.certs import make_tls_cert, serialize_cert, serialize_key
 from tests.lib.path import Path
-from tests.lib.server import make_mock_server, server_running
+from tests.lib.server import MockServer as _MockServer
+from tests.lib.server import Responder, make_mock_server, server_running
 from tests.lib.venv import VirtualEnvironment
-
-if TYPE_CHECKING:
-    from typing import Dict, Iterable
-
-    from tests.lib.server import MockServer as _MockServer
-    from tests.lib.server import Responder
 
 
 def pytest_addoption(parser):

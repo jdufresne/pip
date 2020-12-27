@@ -10,7 +10,18 @@ from enum import Enum
 from functools import partial
 from hashlib import sha256
 from io import BytesIO, StringIO
-from typing import TYPE_CHECKING
+from typing import (
+    AnyStr,
+    Callable,
+    Dict,
+    Iterable,
+    List,
+    Optional,
+    Sequence,
+    Tuple,
+    TypeVar,
+    Union,
+)
 from zipfile import ZipFile
 
 from pip._vendor.requests.structures import CaseInsensitiveDict
@@ -18,27 +29,13 @@ from pip._vendor.six import ensure_binary, ensure_text
 
 from tests.lib.path import Path
 
-if TYPE_CHECKING:
-    from typing import (
-        AnyStr,
-        Callable,
-        Dict,
-        Iterable,
-        List,
-        Optional,
-        Sequence,
-        Tuple,
-        TypeVar,
-        Union,
-    )
-
-    # path, digest, size
-    RecordLike = Tuple[str, str, str]
-    RecordCallback = Callable[
-        [List["Record"]], Union[str, bytes, List[RecordLike]]
-    ]
-    # As would be used in metadata
-    HeaderValue = Union[str, List[str]]
+# path, digest, size
+RecordLike = Tuple[str, str, str]
+RecordCallback = Callable[
+    [List["Record"]], Union[str, bytes, List[RecordLike]]
+]
+# As would be used in metadata
+HeaderValue = Union[str, List[str]]
 
 
 File = namedtuple("File", ["name", "contents"])
@@ -51,14 +48,10 @@ class Default(Enum):
 
 _default = Default.token
 
+T = TypeVar("T")
 
-if TYPE_CHECKING:
-    T = TypeVar("T")
-
-    class Defaulted(Union[Default, T]):
-        """A type which may be defaulted.
-        """
-        pass
+# A type which may be defaulted.
+Defaulted = Union[Default, T]
 
 
 def message_from_dict(headers):

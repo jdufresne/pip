@@ -1,12 +1,9 @@
 from contextlib import contextmanager
-from typing import TYPE_CHECKING
+from typing import ContextManager, Iterator, TypeVar
 
 from pip._vendor.contextlib2 import ExitStack
 
-if TYPE_CHECKING:
-    from typing import ContextManager, Iterator, TypeVar
-
-    _T = TypeVar('_T', covariant=True)
+_T = TypeVar('_T', covariant=True)
 
 
 class CommandContextMixIn:

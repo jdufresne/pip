@@ -10,16 +10,12 @@ something.
 
 import functools
 import itertools
-from typing import TYPE_CHECKING
+from typing import Callable, Iterator, Optional, Set
 
+from pip._vendor.packaging.version import _BaseVersion
 from pip._vendor.six.moves import collections_abc  # type: ignore
 
-if TYPE_CHECKING:
-    from typing import Callable, Iterator, Optional, Set
-
-    from pip._vendor.packaging.version import _BaseVersion
-
-    from .base import Candidate
+from .base import Candidate
 
 
 def _deduplicated_by_version(candidates):

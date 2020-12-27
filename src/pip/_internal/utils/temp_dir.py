@@ -4,7 +4,7 @@ import logging
 import os.path
 import tempfile
 from contextlib import contextmanager
-from typing import TYPE_CHECKING
+from typing import Any, Dict, Iterator, Optional, TypeVar, Union
 
 from pip._vendor.contextlib2 import ExitStack
 from pip._vendor.six import ensure_text
@@ -12,10 +12,7 @@ from pip._vendor.six import ensure_text
 from pip._internal.utils.compat import WINDOWS
 from pip._internal.utils.misc import enum, rmtree
 
-if TYPE_CHECKING:
-    from typing import Any, Dict, Iterator, Optional, TypeVar, Union
-
-    _T = TypeVar('_T', bound='TempDirectory')
+_T = TypeVar('_T', bound='TempDirectory')
 
 
 logger = logging.getLogger(__name__)
