@@ -11,7 +11,6 @@ from contextlib import ExitStack, contextmanager
 
 import pytest
 from mock import patch
-from pip._vendor.contextlib2 import nullcontext
 from setuptools.wheel import Wheel
 
 from pip._internal.cli.main import main as pip_entry_point
@@ -22,6 +21,8 @@ from tests.lib.certs import make_tls_cert, serialize_cert, serialize_key
 from tests.lib.path import Path
 from tests.lib.server import make_mock_server, server_running
 from tests.lib.venv import VirtualEnvironment
+
+from .compat import nullcontext
 
 if MYPY_CHECK_RUNNING:
     from typing import Dict, Iterable
