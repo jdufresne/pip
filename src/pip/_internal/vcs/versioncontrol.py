@@ -6,6 +6,7 @@ import shutil
 import subprocess
 import sys
 import urllib.parse
+from typing import TYPE_CHECKING
 
 from pip._vendor import pkg_resources
 
@@ -26,10 +27,9 @@ from pip._internal.utils.subprocess import (
     make_subprocess_output_error,
     reveal_command_args,
 )
-from pip._internal.utils.typing import MYPY_CHECK_RUNNING
 from pip._internal.utils.urls import get_url_scheme
 
-if MYPY_CHECK_RUNNING:
+if TYPE_CHECKING:
     from typing import (
         Any,
         Dict,

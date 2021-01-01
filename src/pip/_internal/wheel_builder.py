@@ -6,6 +6,7 @@ import os.path
 import re
 import shutil
 import zipfile
+from typing import TYPE_CHECKING
 
 from pip._vendor.packaging.utils import canonicalize_name, canonicalize_version
 from pip._vendor.packaging.version import InvalidVersion, Version
@@ -21,12 +22,11 @@ from pip._internal.utils.misc import ensure_dir, hash_file, is_wheel_installed
 from pip._internal.utils.setuptools_build import make_setuptools_clean_args
 from pip._internal.utils.subprocess import call_subprocess
 from pip._internal.utils.temp_dir import TempDirectory
-from pip._internal.utils.typing import MYPY_CHECK_RUNNING
 from pip._internal.utils.urls import path_to_url
 from pip._internal.utils.wheel import pkg_resources_distribution_for_wheel
 from pip._internal.vcs import vcs
 
-if MYPY_CHECK_RUNNING:
+if TYPE_CHECKING:
     from typing import Any, Callable, Iterable, List, Optional, Tuple
 
     from pip._internal.cache import WheelCache

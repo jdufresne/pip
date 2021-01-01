@@ -4,12 +4,12 @@
 import configparser
 import logging
 import os
+from typing import TYPE_CHECKING
 
 from pip._internal.exceptions import BadCommand, SubProcessError
 from pip._internal.utils.misc import display_path
 from pip._internal.utils.subprocess import make_command
 from pip._internal.utils.temp_dir import TempDirectory
-from pip._internal.utils.typing import MYPY_CHECK_RUNNING
 from pip._internal.utils.urls import path_to_url
 from pip._internal.vcs.versioncontrol import (
     VersionControl,
@@ -17,7 +17,7 @@ from pip._internal.vcs.versioncontrol import (
     vcs,
 )
 
-if MYPY_CHECK_RUNNING:
+if TYPE_CHECKING:
     from pip._internal.utils.misc import HiddenText
     from pip._internal.vcs.versioncontrol import RevOptions
 
