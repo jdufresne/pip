@@ -4,15 +4,14 @@ import ssl
 import threading
 from contextlib import contextmanager
 from textwrap import dedent
+from typing import TYPE_CHECKING
 
 from mock import Mock
 from pip._vendor.contextlib2 import nullcontext
 from werkzeug.serving import WSGIRequestHandler
 from werkzeug.serving import make_server as _make_server
 
-from pip._internal.utils.typing import MYPY_CHECK_RUNNING
-
-if MYPY_CHECK_RUNNING:
+if TYPE_CHECKING:
     from types import TracebackType
     from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Type
 
